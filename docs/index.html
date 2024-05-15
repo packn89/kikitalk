@@ -43,6 +43,7 @@
     </div><div>
         <input type="button" value="画像生成" onclick="makeImage()" />
     </div>
+    <br />
 
     <!-- コンテンツ -->
     <div style="border: solid;" class="overDiv">
@@ -174,6 +175,10 @@
         changeFukidashi($(this).val());
     });
 
+    function saveSettings() {
+        let sw = $('input[type = "range"][name = "screenWidth"]').val();
+        let iw = $('input[type = "range"][name = "iconWidth"]').val();
+    }
 </script>
 
 
