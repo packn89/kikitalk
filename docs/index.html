@@ -1,54 +1,56 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
+<head>
     <meta charset="UTF-8">
     <title>Page Title</title>
     <script src="https://cdn.jsdelivr.net/npm/dom-to-image@2.6.0/dist/dom-to-image.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.js"
             integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
             crossorigin="anonymous"></script>
-  </head>
-  <body>
+</head>
+<body>
     <div class="inputArea">
-      <div class="inputName">
-        <span>パペットネーム</span>
-        <input type="text" name="inputPuppetName" value="test"/>
-      </div>
-      <div class="inputIcon">
-        <span>アイコン</span>
-        <input type="file" name="inputPuppetIcon" accept="image/png, image/jpg"/>
-      </div>
-      <div class="inputMsg">
-        <span>メッセージ</span>
-        <textarea name="inputPuppetMsg" maxlength=50 rows=5 cols=20>123
-456
-789</textarea>
-      </div>
-    </div>
-    <input type="button" name="createMsg" value="生成" onclick="makeMessage()"/>
-    <div style="border: solid;" class="overDiv">
-      <div id="kikitalk">
-        <div id="k_main">
-          <!-- メッセージ部 scriptで生成 -->
-          <div id="k_message">
-          </div>
+        <div class="inputName">
+            <div class="hidari">パペットネーム</div>
+            <div class="migi"><input type="text" name="inputPuppetName" value="test" /></div>
         </div>
-      </div>
+        <div class="inputIcon">
+            <div class="hidari">アイコン</div>
+            <div class="migi">
+                <input type="file" name="inputPuppetIcon" accept="image/png, image/jpg" />
+            </div>
+        </div>
+        <div class="inputMsg">
+            <div class="hidari">メッセージ</div>
+            <div class="migi">
+                <textarea name="inputPuppetMsg" maxlength=50 rows=5 cols=20></textarea>
+            </div>
+        </div>
+    </div>
+    <input type="button" name="createMsg" value="生成" onclick="makeMessage()" />
+    <div>
+        <span>画面幅</span>
+        <input type="range" min="100" max="1980" step="10" name="screenWidth" value="500">
+        <input type="number" min="100" max="1980" name="screenWidth" value="500">
     </div>
     <div>
-      <span>画面幅</span>
-      <input type="range" min="100" max="1980" step="10" name="screenWidth" value="500">
-      <input type="number" min="100" max="1980" name="screenWidth" value="500">
-    </div>
-    <div>
-      <span>アイコンサイズ</span>
-      <input type="range" min="60" max="500" step="10" name="iconWidth" value="85">
-      <input type="number" min="60" max="500" name="iconWidth" value="85">
+        <span>アイコンサイズ</span>
+        <input type="range" min="60" max="500" step="10" name="iconWidth" value="85">
+        <input type="number" min="60" max="500" name="iconWidth" value="85">
     </div><div>
-      <input type="button" value="画像生成" onclick="makeImage()"/>
+        <input type="button" value="画像生成" onclick="makeImage()" />
     </div>
-  </body>
-  <script>
+    <div style="border: solid;" class="overDiv">
+        <div id="kikitalk">
+            <div id="k_main">
+                <!-- メッセージ部 scriptで生成 -->
+                <div id="k_message">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
     /** メッセージ配列 */
     var msgAry = [];
     /** デフォルトイメージ（base64） */
@@ -63,7 +65,7 @@
     function parseData() {
         // メッセージを変数に格納
         msgAry = $('textarea[name=inputPuppetMsg]').val().split(/\n/);
-      }
+    }
 
     /**
      * キキトークのメッセージ部作成
@@ -94,9 +96,9 @@
         var imgFile = $('input[name=inputPuppetIcon]').prop('files')[0];
         if (imgFile) {
             var fr = new FileReader();
-            fr.onload = function() {
-              // アイコン置換
-              $('.km_icon').css('background-image', 'url(' + fr.result + ')');
+            fr.onload = function () {
+                // アイコン置換
+                $('.km_icon').css('background-image', 'url(' + fr.result + ')');
             }
             // アイコンの読み込み処理
             fr.readAsDataURL(imgFile);
@@ -126,7 +128,7 @@
                 link.download = $('input[name=inputPuppetName]').val() + '.jpeg';
                 link.href = dataUrl;
                 link.click();
-        });
+            });
     }
 
     // 入力された値で指定のCSSカスタムプロパティを上書きする
@@ -137,27 +139,27 @@
     }
 
     // 画面幅スライダーチェンジイベント
-    $('input[type="range"][name="screenWidth"]').on('input', function() {
+    $('input[type="range"][name="screenWidth"]').on('input', function () {
         changeStyle(this, '--screen-width');
     });
 
     // アイコン幅スライダーチェンジイベント
-    $('input[type="range"][name="iconWidth"]').on('input', function() {
+    $('input[type="range"][name="iconWidth"]').on('input', function () {
         changeStyle(this, '--icon-width');
     });
 
     // 画面幅入力チェンジイベント
-    $('input[type="number"][name="screenWidth"]').on('change', function() {
+    $('input[type="number"][name="screenWidth"]').on('change', function () {
         changeStyle(this, '--screen-width');
     });
 
     // アイコン幅入力チェンジイベント
-    $('input[type="number"][name="iconWidth"]').on('change', function() {
+    $('input[type="number"][name="iconWidth"]').on('change', function () {
         changeStyle(this, '--icon-width');
     });
 
-  </script>
-  <style>
+</script>
+<style>
     :root {
         --hidari-width: 100px;
         --migi-width: 300px;
@@ -168,9 +170,20 @@
         --msg-height: calc((var(--icon-width) - (var(--msg-padding) * 2) - var(--msg-margin-top)) / 2);
     }
 
+    .hidari {
+        display: inline-block;
+        width: var(--hidari-width);
+    }
+
+    .migi {
+        display: inline-block;
+        width: var(--migi-width);
+    }
+
     .overDiv {
         width: var(--screen-width);
     }
+
     #kikitalk {
         display: flex;
         flex-direction: column;
@@ -254,22 +267,23 @@
         -webkit-border-radius: 10px;
         -moz-border-radius: 10px;
     }
-    .km_data:after {
-        border: solid transparent;
-        content: "";
-        height: 0;
-        width: 0;
-        pointer-events: none;
-        position: absolute;
-        border-color: rgba(76, 90, 111, 0);
-        border-top-width: 8px;
-        border-bottom-width: 8px;
-        border-left-width: 10px;
-        border-right-width: 10px;
-        margin-top: -8px;
-        border-right-color: #4c5a6f;
-        right: 100%;
-        top: 20px;
-    }
-  </style>
+
+        .km_data:after {
+            border: solid transparent;
+            content: "";
+            height: 0;
+            width: 0;
+            pointer-events: none;
+            position: absolute;
+            border-color: rgba(76, 90, 111, 0);
+            border-top-width: 8px;
+            border-bottom-width: 8px;
+            border-left-width: 10px;
+            border-right-width: 10px;
+            margin-top: -8px;
+            border-right-color: #4c5a6f;
+            right: 100%;
+            top: 20px;
+        }
+</style>
 </html>
