@@ -9,6 +9,7 @@
             crossorigin="anonymous"></script>
 </head>
 <body>
+    <!-- 入力 -->
     <div class="inputArea">
         <div class="inputName">
             <div class="hidari">パペットネーム</div>
@@ -27,6 +28,8 @@
             </div>
         </div>
     </div>
+
+    <!-- 調整するとこ -->
     <input type="button" name="createMsg" value="生成" onclick="makeMessage()" />
     <div>
         <span>画面幅</span>
@@ -40,6 +43,8 @@
     </div><div>
         <input type="button" value="画像生成" onclick="makeImage()" />
     </div>
+
+    <!-- コンテンツ -->
     <div style="border: solid;" class="overDiv">
         <div id="kikitalk">
             <div id="k_main">
@@ -50,6 +55,8 @@
         </div>
     </div>
 </body>
+
+
 <script>
     /** メッセージ配列 */
     var msgAry = [];
@@ -138,6 +145,13 @@
         rootProp.style.setProperty(propName, val + 'px');
     }
 
+    // 吹き出しのでっぱってるとこのサイズ
+    function changeFukidashi(val) {
+        let fukidashi = val * 0.8;
+        rootProp.style.setProperty('--hukidashi-width', fukidashi + 'px');
+        
+    }
+
     // 画面幅スライダーチェンジイベント
     $('input[type="range"][name="screenWidth"]').on('input', function () {
         changeStyle(this, '--screen-width');
@@ -146,6 +160,7 @@
     // アイコン幅スライダーチェンジイベント
     $('input[type="range"][name="iconWidth"]').on('input', function () {
         changeStyle(this, '--icon-width');
+        changeFukidashi($(this).val());
     });
 
     // 画面幅入力チェンジイベント
@@ -156,14 +171,18 @@
     // アイコン幅入力チェンジイベント
     $('input[type="number"][name="iconWidth"]').on('change', function () {
         changeStyle(this, '--icon-width');
+        changeFukidashi($(this).val());
     });
 
 </script>
+
+
 <style>
     :root {
-        --hidari-width: 300px;
+        --hidari-width: 200px;
         --migi-width: 600px;
         --icon-width: 85px;
+        --hukidashi-width: 10px;
         --screen-width: 500px;
         --msg-padding: 10px;
         --msg-margin-top: 5px;
@@ -221,7 +240,7 @@
     .km_icon {
         width: var(--icon-width);
         aspect-ratio: 1;
-        margin: 0 20px;
+        margin: 0 var(--hukidashi-width) 0 20px;
         align-content: center;
         text-align: center;
         border-radius: 50%;
@@ -276,10 +295,10 @@
             pointer-events: none;
             position: absolute;
             border-color: rgba(76, 90, 111, 0);
-            border-top-width: 8px;
-            border-bottom-width: 8px;
-            border-left-width: 10px;
-            border-right-width: 10px;
+            border-top-width: calc(var(--hukidashi-width) * 0.8 );
+            border-bottom-width: calc(var(--hukidashi-width) * 0.8 );
+            border-left-width: var(--hukidashi-width);
+            border-right-width: var(--hukidashi-width);
             margin-top: -8px;
             border-right-color: #4c5a6f;
             right: 100%;
