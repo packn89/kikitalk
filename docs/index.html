@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>Page Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/dom-to-image@2.6.0/dist/dom-to-image.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+            crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div class="inputArea">
+      <div class="inputName">
+        <span>パペットネーム</span>
+        <input type="text" name="inputPuppetName" value="test"/>
+      </div>
+      <div class="inputIcon">
+        <span>アイコン</span>
+        <input type="file" name="inputPuppetIcon" accept="image/png, image/jpg"/>
+      </div>
+      <div class="inputMsg">
+        <span>メッセージ</span>
+        <textarea name="inputPuppetMsg" maxlength=50 rows=5 cols=20>123
+456
+789</textarea>
+      </div>
+    </div>
+    <input type="button" name="createMsg" value="生成" onclick="makeMessage()"/>
+    <div style="border: solid;" class="overDiv">
+      <div id="kikitalk">
+        <div id="k_main">
+          <!-- メッセージ部 scriptで生成 -->
+          <div id="k_message">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <span>画面幅</span>
+      <input type="range" min="100" max="1980" step="10" name="screenWidth" value="500">
+      <input type="number" min="100" max="1980" name="screenWidth" value="500">
+    </div>
+    <div>
+      <span>アイコンサイズ</span>
+      <input type="range" min="60" max="500" step="10" name="iconWidth" value="85">
+      <input type="number" min="60" max="500" name="iconWidth" value="85">
+    </div><div>
+      <input type="button" value="画像生成" onclick="makeImage()"/>
+    </div>
+  </body>
+  <script>
+    /** メッセージ配列 */
+    var msgAry = [];
+    /** デフォルトイメージ（base64） */
+    const defaultImg = "./default.jpg"
+    /** :root要素 */
+    var rootProp = document.querySelector(':root');
+
+    /**
+     * テキストエリアを読んで配列に格納する<br>
+     * 改行ごとに１レコード<br>
+     */
+    function parseData() {
+        // メッセージを変数に格納
+        msgAry = $('textarea[name=inputPuppetMsg]').val().split(/\n/);
+      }
+
+    /**
+     * キキトークのメッセージ部作成
+     * @param index インデックス
+     */
+    function makeMessage() {
+        // 表示中のメッセージを削除
+        $("#k_message").empty();
+
+        // テキストエリア読み込み
+        parseData();
+
+        // 対象パペットデータ
+        let name = $('input[name=inputPuppetName]').val();
+
+        // 最初のメッセージ
+        let firstSrc = "<div class='km_content'>" +
+            "    <div class='km_icon' style='background-image: url(" + defaultImg + ");'></div>" +
+            "    <div class='km_message'>" +
+            "    <div class='km_name'>" + name + "</div>" +
+            "    <div class='km_data'>" +
+            msgAry[0] + "</div> " +
+            "    </div>" +
+            "</div>";
+        $("#k_message").append(firstSrc);
+
+        // アイコンがアップロードされていれば置換
+        var imgFile = $('input[name=inputPuppetIcon]').prop('files')[0];
+        if (imgFile) {
+            var fr = new FileReader();
+            fr.onload = function() {
+              // アイコン置換
+              $('.km_icon').css('background-image', 'url(' + fr.result + ')');
+            }
+            // アイコンの読み込み処理
+            fr.readAsDataURL(imgFile);
+        }
+
+        // 以降はあれば
+        if (msgAry.length < 2) {
+            return;
+        }
+        for (i = 1; i < msgAry.length; i++) {
+            let src = "<div class='km_content'>" +
+                "    <div class='km_icon_non'></div>" +
+                "    <div class='km_message'>" +
+                "    <div class='km_data'>" +
+                msgAry[i] + "</div>" +
+                "    </div>" +
+                "</div>";
+            $("#k_message").append(src);
+        }
+    }
+
+    // メッセージ画像の生成・保存
+    function makeImage() {
+        domtoimage.toJpeg(document.getElementById('kikitalk'), { quality: 0.95 })
+            .then(function (dataUrl) {
+                var link = document.createElement('a');
+                link.download = $('input[name=inputPuppetName]').val() + '.jpeg';
+                link.href = dataUrl;
+                link.click();
+        });
+    }
+
+    // 入力された値で指定のCSSカスタムプロパティを上書きする
+    function changeStyle(obj, propName) {
+        let val = $(obj).val();
+        $('input[name="' + $(obj).attr('name') + '"]').val(val);
+        rootProp.style.setProperty(propName, val + 'px');
+    }
+
+    // 画面幅スライダーチェンジイベント
+    $('input[type="range"][name="screenWidth"]').on('input', function() {
+        changeStyle(this, '--screen-width');
+    });
+
+    // アイコン幅スライダーチェンジイベント
+    $('input[type="range"][name="iconWidth"]').on('input', function() {
+        changeStyle(this, '--icon-width');
+    });
+
+    // 画面幅入力チェンジイベント
+    $('input[type="number"][name="screenWidth"]').on('change', function() {
+        changeStyle(this, '--screen-width');
+    });
+
+    // アイコン幅入力チェンジイベント
+    $('input[type="number"][name="iconWidth"]').on('change', function() {
+        changeStyle(this, '--icon-width');
+    });
+
+  </script>
+  <style>
+    :root {
+        --icon-width: 85px;
+        --screen-width: 500px;
+        --msg-padding: 10px;
+        --msg-margin-top: 5px;
+        --msg-height: calc((var(--icon-width) - (var(--msg-padding) * 2) - var(--msg-margin-top)) / 2);
+    }
+
+    .overDiv {
+        width: var(--screen-width);
+    }
+    #kikitalk {
+        display: flex;
+        flex-direction: column;
+        width: var(--screen-width);
+        height: 100%;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    #k_main {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 100%;
+    }
+
+    #k_message {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        padding: 2vh 0.5vw;
+    }
+
+    .km_content {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        height: auto;
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    .km_icon {
+        width: var(--icon-width);
+        aspect-ratio: 1;
+        margin: 0 20px;
+        align-content: center;
+        text-align: center;
+        border-radius: 50%;
+        background-size: 100%;
+    }
+
+    .km_icon_non {
+        width: var(--icon-width);
+        height: 0;
+        margin: 0 20px;
+        align-content: center;
+        text-align: center;
+        border-radius: 50%;
+    }
+
+    .km_name {
+        display: flex;
+        align-items: center;
+        height: var(--msg-height);
+        font-size: calc(var(--msg-height) / 1.33);
+        margin-left: 10px;
+    }
+
+    .km_message {
+        width: auto;
+        max-width: calc(var(--screen-width) - var(--icon-width) - 40px)
+    }
+
+    .km_data {
+        position: relative;
+        display: flex;
+        align-items: center;
+        min-height: var(--msg-height);
+        height: auto;
+        background: #4c5a6f;
+        padding: var(--msg-padding);
+        margin-top: var(--msg-margin-top);
+        text-align: left;
+        word-break: break-all;
+        color: #ffffff;
+        font-size: calc(var(--msg-height) / 1.33);
+        border-radius: 10px;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+    }
+    .km_data:after {
+        border: solid transparent;
+        content: "";
+        height: 0;
+        width: 0;
+        pointer-events: none;
+        position: absolute;
+        border-color: rgba(76, 90, 111, 0);
+        border-top-width: 8px;
+        border-bottom-width: 8px;
+        border-left-width: 10px;
+        border-right-width: 10px;
+        margin-top: -8px;
+        border-right-color: #4c5a6f;
+        right: 100%;
+        top: 20px;
+    }
+  </style>
+</html>
